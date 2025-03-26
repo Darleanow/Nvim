@@ -1,24 +1,40 @@
--- load defaults i.e lua_lsp
+-- Load NvChad default LSP config
 require("nvchad.configs.lspconfig").defaults()
 
 local lspconfig = require "lspconfig"
-
--- EXAMPLE
-local servers = { "html", "cssls" }
 local nvlsp = require "nvchad.configs.lspconfig"
 
--- lsps with default config
-for _, lsp in ipairs(servers) do
-  lspconfig[lsp].setup {
-    on_attach = nvlsp.on_attach,
-    on_init = nvlsp.on_init,
-    capabilities = nvlsp.capabilities,
-  }
+-- List of LSP servers to load
+local servers = { "html", "cssls", "clangd" }
+
+-- Function to enable format on save
+local on_attach = function(client, bufnr)
+    nvlsp.on_attach(client, bufnr) -- Load NvChad’s default on_attach
+
+    -- Enable format on save for clangd
+    if client.server_capabilities.documentFormattingProvider then
+        vim.api.nvim_create_autocmd("BufWritePre", {
+            buffer = bufnr,
+            callback = function()
+                vim.lsp.buf.format({ async = false })
+            end,
+        })
+    end
 end
 
--- configuring single server, example: typescript
--- lspconfig.ts_ls.setup {
---   on_attach = nvlsp.on_attach,
---   on_init = nvlsp.on_init,
---   capabilities = nvlsp.capabilities,
--- }
+-- Configure LSP servers
+for _, lsp in ipairs(servers) do
+    if lsp == "clangd" then
+        lspconfig.clangd.setup({
+            on_attach = on_attach,
+            on_init = nvlsp.on_init,
+            capabilities = nvlsp.capabilities,
+        })
+    else
+        lspconfig[lsp].setup({
+            on_attach = nvlsp.on_attach,
+            on_init = nvlsp.on_init,
+            capabilities = nvlsp.capabilities,
+        })
+    end
+end
