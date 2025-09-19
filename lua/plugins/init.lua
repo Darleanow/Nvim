@@ -1,7 +1,7 @@
 return {
   {
     "stevearc/conform.nvim",
-    -- event = 'BufWritePre', -- uncomment for format on save
+    event = "BufWritePre",
     opts = require "configs.conform",
   },
 
@@ -9,15 +9,15 @@ return {
     "nvim-treesitter/nvim-treesitter",
     event = { "BufReadPre", "BufNewFile" },
     config = function()
-        require("configs.treesitter")
-    end
+      require "configs.treesitter"
+    end,
   },
 
   {
     "nvim-tree/nvim-tree.lua",
-    cmd = { "NvimTreeToggle", "NvimTreeFocus"},
+    cmd = { "NvimTreeToggle", "NvimTreeFocus" },
     config = function()
-      require("configs.nvimtree")
+      require "configs.nvimtree"
     end,
   },
 
@@ -25,7 +25,7 @@ return {
     "nvimtools/none-ls.nvim",
     event = "VeryLazy",
     config = function()
-      require("configs.null-ls")
+      require "configs.null-ls"
     end,
   },
 
