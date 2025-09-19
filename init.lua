@@ -32,6 +32,22 @@ dofile(vim.g.base46_cache .. "statusline")
 require "options"
 require "nvchad.autocmds"
 
+vim.g.clipboard = {
+  name = "WslClipboard",
+  copy = {
+    ["+"] = "clip.exe",
+    ["*"] = "clip.exe",
+  },
+  paste = {
+    ["+"] = "powershell.exe Get-Clipboard",
+    ["*"] = "powershell.exe Get-Clipboard",
+  },
+  cache_enabled = 0,
+}
+
+vim.keymap.set("v", "<C-c>", '"+y')
+vim.keymap.set("i", "<C-v>", '"+p')
+
 vim.schedule(function()
   require "mappings"
 end)
