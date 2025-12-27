@@ -1,16 +1,10 @@
--- Load NvChad default LSP config
-require("nvchad.configs.lspconfig").defaults()
-
-local lspconfig = require "lspconfig"
-local nvlsp = require "nvchad.configs.lspconfig"
-
--- List of LSP servers to load
-local servers = { "html", "cssls", "clangd", "pyright" }
-
--- Function to enable format on save
 local on_attach = function(client, bufnr)
-  nvlsp.on_attach(client, bufnr) -- Load NvChad’s default on_attach
+  local nvlsp_ok, nvlsp = pcall(require, "nvchad.configs.lspconfig")
+  if nvlsp_ok and nvlsp.on_attach then
+    nvlsp.on_attach(client, bufnr)
+  end
 
+  -- Format on save
   if client.server_capabilities.documentFormattingProvider then
     vim.api.nvim_create_autocmd("BufWritePre", {
       buffer = bufnr,
@@ -21,19 +15,13 @@ local on_attach = function(client, bufnr)
   end
 end
 
--- Configure LSP servers
-for _, lsp in ipairs(servers) do
-  if lsp == "clangd" or lsp == "pyright" then
-    lspconfig[lsp].setup {
-      on_attach = on_attach,
-      on_init = nvlsp.on_init,
-      capabilities = nvlsp.capabilities,
-    }
-  else
-    lspconfig[lsp].setup {
-      on_attach = nvlsp.on_attach,
-      on_init = nvlsp.on_init,
-      capabilities = nvlsp.capabilities,
-    }
-  end
-end
+local common_config = {
+  on_attach = on_attach,
+}
+
+vim.lsp.config("html", common_config)
+vim.lsp.config("cssls", common_config)
+vim.lsp.config("clangd", common_config)
+vim.lsp.config("pyright", common_config)
+
+vim.lsp.enable { "html", "cssls", "clangd", "pyright" }
